@@ -1,6 +1,7 @@
 package com.epam.mjc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,70 +14,63 @@ import java.util.function.Supplier;
 public class InterfaceCreator {
 
     public Predicate<List<String>> isValuesStartWithUpperCase() {
-        return list -> {
-            boolean result = true;
-            for (String elList : list) {
-                char firstLetter = elList.charAt(0);
-                if (firstLetter < 65 || firstLetter > 90) {
-                    result = false;
-                    break;
+        return x -> {
+            for (String str : x) {
+                if (str.charAt(0) < 65 ||  str.charAt(0) > 90) {
+                    return false;
                 }
             }
-            return result;
+            return true;
         };
     }
 
     public Consumer<List<Integer>> addEvenValuesAtTheEnd() {
-        return list -> {
-            List<Integer> newList = new ArrayList<>();
-            for (int elList : list) {
-                if (elList % 2 == 0) {
-                    newList.add(elList);
+        return x -> {
+            int listSize = x.size();
+            for (int i = 0; i < listSize; i++) {
+                int el = x.get(i);
+                if (el % 2 == 0) {
+                    x.add(el);
                 }
             }
-            list.addAll(newList);
         };
     }
 
     public Supplier<List<String>> filterCollection(List<String> values) {
+        List<String> filteredList = new ArrayList<>();
         return () -> {
-            List<String> list = new ArrayList<>();
-            for (String sequence: values) {
-                if (sequence.endsWith(".") && sequence.charAt(0) >= 65 && sequence.charAt(0) <= 90) {
-                    String[] words = sequence.split(" ");
-                    int countWord = 0;
-                    for (String word : words) {
-                        char firstLetter = word.charAt(0);
-                        if (firstLetter >= 65 && firstLetter <= 90 || firstLetter >= 97 && firstLetter <= 122) {
-                            countWord++;
+            int startIndex = 0;
+                for (String value : values) {
+                    if (value.charAt(startIndex) >= 65 && value.charAt(startIndex) <= 90
+                            && value.endsWith(".")) {
+                        Predicate<String> isHaveMore3Word = x -> {
+                            return x.split(" ").length > 3;
+                        };
+                        if (isHaveMore3Word.test(value)) {
+                            filteredList.add(value);
                         }
                     }
-                    if (countWord > 3) {
-                        list.add(sequence);
-                    }
                 }
-            }
-            return list;
+            return filteredList;
         };
-
     }
 
     public Function<List<String>, Map<String, Integer>> stringSize() {
-        return list -> {
-            Map<String, Integer> map = new HashMap<>();
-            for (String str : list) {
-                map.put(str, str.length());
+        Map<String, Integer> letterScore = new HashMap<>();
+        return x -> {
+            for (String str : x) {
+                letterScore.put(str, str.length());
             }
-            return map;
+            return letterScore;
         };
     }
 
     public BiFunction<List<Integer>, List<Integer>, List<Integer>> concatList() {
-        return (list1, list2) -> {
-            List<Integer> newList = new ArrayList<>();
-            newList.addAll(list1);
-            newList.addAll(list2);
-            return  newList;
+        List<Integer> newList = new ArrayList<>();
+        return (x, y) -> {
+            newList.addAll(x);
+            newList.addAll(y);
+            return newList;
         };
     }
 }
